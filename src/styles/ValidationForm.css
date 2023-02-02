@@ -19,3 +19,8 @@
   width: 200px;
   margin: 10px 50px;
 }
+
+.status-form {
+  color: rgb(70, 113, 35);
+  font-weight: bold;
+}

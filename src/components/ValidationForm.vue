@@ -1,27 +1,50 @@
 <template>
   <div>
+
     <div class="form-errors">
+
       <p class="errors-msg" v-for="error in errors" :key="error">{{ error }}</p>
+
     </div>
+
     <form class="validation-form" @submit.prevent="sendForm">
+
       <label class="label-form" for="form-name">
+
         Name:
+
         <input type="text" id="form-name" placeholder="Enter your name here" v-model="userName">
+
       </label>
+
       <label class="label-form" for="form-email">
+
         Email:
+
         <input type="email" id="form-email" placeholder="Enter your email here" v-model="userEmail">
+
       </label>
+
       <label class="label-form" for="form-subject">
+
         Subject:
+
         <input type="text" id="form-subject" placeholder="Enter subject here" v-model="userSubject">
+
       </label>
+
       <label class="label-form" for="form-message">
+
         Message:
+
         <input type="text" id="form-message" placeholder="Enter message here" v-model="userMessage">
+
       </label>
-      <button class="button-form">SEND</button>
+
+      <button class="button-form" type="submit">SEND</button>
+
     </form>
+
   </div>
 </template>
 
@@ -50,6 +73,7 @@ export default {
         userMessage: this.userMessage,
       },
       errors: [],
+      sendStatus: '',
     }
   },
   methods: {
@@ -85,8 +109,17 @@ export default {
     sendForm() {
       this.validateForm();
       if (this.errors.length === 0) {
-        this.axios.post('/message', this.messageBody).
-          then(response => console.log(response))
+        this.axios.post('https://f16636d1-e3c1-4119-bd35-4f5587ddc2cb.mock.pstmn.io/message',
+          this.messageBody)
+          .then(response => this.sendStatus = response.data.status)
+          .catch(err => console.log(err))
+        if (this.sendStatus === 'succes') {
+          alert('Send succesfully!');
+        }
+        this.userName = '';
+        this.userEmail = '';
+        this.userSubject = '';
+        this.userMessage = '';
       }
     }
   }
