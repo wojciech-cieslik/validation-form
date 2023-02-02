@@ -6,10 +6,20 @@
 
 
 .label-form {
-  margin: 10px;
+  padding: 14px 0px;
+  margin: 0 10px;
   width: 300px;
   display: flex;
+  position: relative;
   justify-content: space-between;
+}
+
+.label-form span {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 12px;
+  color: #f00;
 }
 
 .errors-msg {

@@ -1,8 +1,6 @@
 <template>
   <div>
 
-    <p class="errors-msg" v-for="error in errors" :key="error">{{ error }}</p>
-
     <form class="validation-form" @submit.prevent="sendForm">
 
       <label class="label-form" for="form-name">
@@ -10,6 +8,7 @@
         Name:
 
         <input type="text" id="form-name" placeholder="Enter your name here" v-model="userName">
+        <span>{{ errors.name }}</span>
 
       </label>
 
@@ -18,6 +17,7 @@
         Email:
 
         <input type="email" id="form-email" placeholder="Enter your email here" v-model="userEmail">
+        <span>{{ errors.email }}</span>
 
       </label>
 
@@ -26,7 +26,7 @@
         Subject:
 
         <input type="text" id="form-subject" placeholder="Enter subject here" v-model="userSubject">
-
+        <span>{{ errors.subject }}</span>
       </label>
 
       <label class="label-form" for="form-message">
@@ -34,6 +34,7 @@
         Message:
 
         <input type="text" id="form-message" placeholder="Enter message here" v-model="userMessage">
+        <span>{{ errors.message }}</span>
 
       </label>
 
@@ -68,48 +69,62 @@ export default {
         userSubject: this.userSubject,
         userMessage: this.userMessage,
       },
-      errors: [],
+      errors: {
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+      },
       sendStatus: '',
     }
   },
   methods: {
     validateForm() {
-      this.errors = [];
+      this.errors.name = '';
+      this.errors.email = '';
+      this.errors.subject = '';
+      this.errors.message = '';
 
       if (!this.userName) {
-        this.errors.push('Name is required!')
+        this.errors.name = 'Name is required!';
       } else {
         if (this.userName.length < 5) {
-          this.errors.push('Name must have minimum 5 characters!')
+          this.errors.name = 'Name must be minimum 5 characters!';
         } else if (this.userName.length > 50) {
-          this.errors.push('Name must have maximum 50 characters!')
+          this.errors.name = 'Name must be maximum 50 characters!';
         }
       }
 
       if (!this.userEmail) {
-        this.errors.push('Email is required!')
+        this.errors.email = 'Email is required!';
       } else {
         if (this.userEmail.indexOf('@') < 1) {
-          this.errors.push('Id need before @ in email!')
+          this.errors.email = 'Id need before @ in email!';
         }
       }
 
       if (this.userSubject.length >= 100) {
-        this.errors.push('Subject must be less than 100 characters!')
+        this.errors.subject = 'Subject must be less than 100 characters!';
       }
 
       if (!this.userMessage) {
-        this.errors.push('Message is required!')
+        this.errors.message = 'Message is required!';
       } else {
         if (this.userMessage.length >= 500) {
-          this.errors.push('Message must be less than 500 characters!')
+          this.errors.message = 'Message must be less than 500 characters!';
         }
       }
     },
+    checkErrors() {
+      if (this.errors.name === '' && this.errors.email === ''
+        && this.errors.subject === '' && this.errors.message === '') {
+        return true;
+      } else
+        return false;
+    },
     sendForm() {
       this.validateForm();
-
-      if (this.errors.length === 0) {
+      if (this.checkErrors()) {
         this.axios.post('https://f16636d1-e3c1-4119-bd35-4f5587ddc2cb.mock.pstmn.io/message',
           this.messageBody)
           .then(response => this.sendStatus = response.data.status)
