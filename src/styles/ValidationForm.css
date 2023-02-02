@@ -4,6 +4,7 @@
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
+
 .label-form {
   margin: 10px;
   width: 300px;
@@ -13,6 +14,7 @@
 
 .errors-msg {
   color: #f00;
+  margin-left: 10px;
 }
 
 .button-form {

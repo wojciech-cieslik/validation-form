@@ -1,11 +1,7 @@
 <template>
   <div>
 
-    <div class="form-errors">
-
-      <p class="errors-msg" v-for="error in errors" :key="error">{{ error }}</p>
-
-    </div>
+    <p class="errors-msg" v-for="error in errors" :key="error">{{ error }}</p>
 
     <form class="validation-form" @submit.prevent="sendForm">
 
@@ -79,6 +75,7 @@ export default {
   methods: {
     validateForm() {
       this.errors = [];
+
       if (!this.userName) {
         this.errors.push('Name is required!')
       } else {
@@ -88,6 +85,7 @@ export default {
           this.errors.push('Name must have maximum 50 characters!')
         }
       }
+
       if (!this.userEmail) {
         this.errors.push('Email is required!')
       } else {
@@ -95,9 +93,11 @@ export default {
           this.errors.push('Id need before @ in email!')
         }
       }
+
       if (this.userSubject.length >= 100) {
         this.errors.push('Subject must be less than 100 characters!')
       }
+
       if (!this.userMessage) {
         this.errors.push('Message is required!')
       } else {
@@ -108,18 +108,30 @@ export default {
     },
     sendForm() {
       this.validateForm();
+
       if (this.errors.length === 0) {
         this.axios.post('https://f16636d1-e3c1-4119-bd35-4f5587ddc2cb.mock.pstmn.io/message',
           this.messageBody)
           .then(response => this.sendStatus = response.data.status)
-          .catch(err => console.log(err))
-        if (this.sendStatus === 'succes') {
-          alert('Send succesfully!');
-        }
+          .catch(err => {
+            if (err) {
+              this.sendStatus = 'error'
+            }
+            return console.log(err)
+          })
+      }
+    }
+  },
+  watch: {
+    sendStatus: function () {
+      if (this.sendStatus === 'succes') {
+        alert('Form send succesfully');
         this.userName = '';
         this.userEmail = '';
         this.userSubject = '';
         this.userMessage = '';
+      } else if (this.sendStatus === 'error') {
+        alert('Something went wrong with sending form :(')
       }
     }
   }
