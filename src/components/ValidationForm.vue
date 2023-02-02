@@ -1,47 +1,28 @@
 <template>
   <div>
-
     <form class="validation-form" @submit.prevent="sendForm">
-
       <label class="label-form" for="form-name">
-
         Name:
-
-        <input type="text" id="form-name" placeholder="Enter your name here" v-model="userName">
+        <input @blur="validateName" type="text" id="form-name" placeholder="Enter your name here" v-model="name">
         <span>{{ errors.name }}</span>
-
       </label>
-
       <label class="label-form" for="form-email">
-
         Email:
-
-        <input type="email" id="form-email" placeholder="Enter your email here" v-model="userEmail">
+        <input @blur="validateEmail" type="email" id="form-email" placeholder="Enter your email here" v-model="email">
         <span>{{ errors.email }}</span>
-
       </label>
-
       <label class="label-form" for="form-subject">
-
         Subject:
-
-        <input type="text" id="form-subject" placeholder="Enter subject here" v-model="userSubject">
+        <input @blur="validateSubject" type="text" id="form-subject" placeholder="Enter subject here" v-model="subject">
         <span>{{ errors.subject }}</span>
       </label>
-
       <label class="label-form" for="form-message">
-
         Message:
-
-        <input type="text" id="form-message" placeholder="Enter message here" v-model="userMessage">
+        <input @blur="validateMessage" type="text" id="form-message" placeholder="Enter message here" v-model="message">
         <span>{{ errors.message }}</span>
-
       </label>
-
       <button class="button-form" type="submit">SEND</button>
-
     </form>
-
   </div>
 </template>
 
@@ -50,25 +31,34 @@ import Vue from 'vue';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 
-Vue.use(VueAxios, axios);
-
 import '../styles/ValidationForm.css';
 
+const maxSubjectLength = 100;
+const minNameLength = 5;
+const maxNameLength = 50;
+const maxMessageLength = 500;
+const NAME_REQUIRED_ERROR = 'Name is required!';
+const NAME_MIN_LENGTH_ERROR = 'Name must be minimum 5 characters!';
+const NAME_MAX_LENGTH_ERROR = 'Name must be maximum 50 characters!';
+const EMAIL_REQUIRED_ERROR = 'Email is required!';
+const EMAIL_BAD_ID_ERROR = 'Name is required!';
+const SUBJECT_MAX_LENGTH_ERROR = 'Subject must be less than 100 characters!';
+const MESSAGE_REQUIRED_ERROR = 'Message is required!';
+const MESSAGE_MAX_LENGTH_ERROR = 'Message must be less than 500 characters!';
+const SUCCESS_MESSAGE = 'Form send successfully';
+const ERROR_MESSAGE = 'Something went wrong with sending form :(';
+
+
+Vue.use(VueAxios, axios);
 
 export default {
 
   data() {
     return {
-      userName: '',
-      userEmail: '',
-      userSubject: '',
-      userMessage: '',
-      messageBody: {
-        userName: this.userName,
-        userEmail: this.userEmail,
-        userSubject: this.userSubject,
-        userMessage: this.userMessage,
-      },
+      name: '',
+      email: '',
+      subject: '',
+      message: '',
       errors: {
         name: '',
         email: '',
@@ -79,39 +69,41 @@ export default {
     }
   },
   methods: {
-    validateForm() {
+    validateName() {
       this.errors.name = '';
+      if (!this.name) {
+        this.errors.name = NAME_REQUIRED_ERROR;
+      } else {
+        if (this.name.length < minNameLength) {
+          this.errors.name = NAME_MIN_LENGTH_ERROR;
+        } else if (this.name.length > maxNameLength) {
+          this.errors.name = NAME_MAX_LENGTH_ERROR;
+        }
+      }
+    },
+    validateEmail() {
       this.errors.email = '';
+      if (!this.email) {
+        this.errors.email = EMAIL_REQUIRED_ERROR;
+      } else {
+        if (this.email.indexOf('@') === 0) {
+          this.errors.email = EMAIL_BAD_ID_ERROR;
+        }
+      }
+    },
+    validateSubject() {
       this.errors.subject = '';
+      if (this.subject.length >= maxSubjectLength) {
+        this.errors.subject = SUBJECT_MAX_LENGTH_ERROR;
+      }
+    },
+    validateMessage() {
       this.errors.message = '';
-
-      if (!this.userName) {
-        this.errors.name = 'Name is required!';
+      if (!this.message) {
+        this.errors.message = MESSAGE_REQUIRED_ERROR;
       } else {
-        if (this.userName.length < 5) {
-          this.errors.name = 'Name must be minimum 5 characters!';
-        } else if (this.userName.length > 50) {
-          this.errors.name = 'Name must be maximum 50 characters!';
-        }
-      }
-
-      if (!this.userEmail) {
-        this.errors.email = 'Email is required!';
-      } else {
-        if (this.userEmail.indexOf('@') < 1) {
-          this.errors.email = 'Id need before @ in email!';
-        }
-      }
-
-      if (this.userSubject.length >= 100) {
-        this.errors.subject = 'Subject must be less than 100 characters!';
-      }
-
-      if (!this.userMessage) {
-        this.errors.message = 'Message is required!';
-      } else {
-        if (this.userMessage.length >= 500) {
-          this.errors.message = 'Message must be less than 500 characters!';
+        if (this.message.length >= maxMessageLength) {
+          this.errors.message = MESSAGE_MAX_LENGTH_ERROR;
         }
       }
     },
@@ -123,10 +115,9 @@ export default {
         return false;
     },
     sendForm() {
-      this.validateForm();
       if (this.checkErrors()) {
-        this.axios.post('https://f16636d1-e3c1-4119-bd35-4f5587ddc2cb.mock.pstmn.io/message',
-          this.messageBody)
+        this.axios.post('https://940b0ec3-8a38-4aae-9e22-fff37a53afca.mock.pstmn.io/message',
+          this.dataToSend)
           .then(response => this.sendStatus = response.data.status)
           .catch(err => {
             if (err) {
@@ -137,17 +128,28 @@ export default {
       }
     }
   },
+  computed: {
+    dataToSend() {
+      return {
+        name: this.name,
+        email: this.email,
+        subject: this.subject,
+        message: this.message,
+      }
+    }
+  },
   watch: {
     sendStatus: function () {
-      if (this.sendStatus === 'succes') {
-        alert('Form send succesfully');
-        this.userName = '';
-        this.userEmail = '';
-        this.userSubject = '';
-        this.userMessage = '';
+      if (this.sendStatus === 'success') {
+        alert(SUCCESS_MESSAGE);
+        this.name = '';
+        this.email = '';
+        this.subject = '';
+        this.message = '';
       } else if (this.sendStatus === 'error') {
-        alert('Something went wrong with sending form :(')
+        alert(ERROR_MESSAGE)
       }
+      this.sendStatus = '';
     }
   }
 }
