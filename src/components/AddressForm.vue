@@ -8,8 +8,8 @@
         type="text"
         id="form-city"
         placeholder="Enter city"
-        :value="this.address.city"
-        @blur="changeAddress({ value: $event.target.value, name: 'city' })"
+        v-model="newAddress.city"
+        @blur="changeAddress"
       ></b-form-input>
     </b-input-group>
 
@@ -21,8 +21,8 @@
         type="text"
         id="form-street"
         placeholder="Enter street"
-        :value="this.address.street"
-        @blur="changeAddress({ value: $event.target.value, name: 'street' })"
+        v-model="newAddress.street"
+        @blur="changeAddress"
       ></b-form-input>
     </b-input-group>
 
@@ -35,10 +35,8 @@
         min="1"
         id="form-house-number"
         placeholder="Enter house number"
-        :value="this.address.houseNumber"
-        @blur="
-          changeAddress({ value: $event.target.value, name: 'houseNumber' })
-        "
+        v-model="newAddress.houseNumber"
+        @blur="changeAddress"
       ></b-form-input>
     </b-input-group>
 
@@ -51,10 +49,8 @@
         min="1"
         id="form-apartment-number"
         placeholder="Enter apartment number"
-        :value="this.address.apartmentNumber"
-        @blur="
-          changeAddress({ value: $event.target.value, name: 'apartmentNumber' })
-        "
+        v-model="newAddress.apartmentNumber"
+        @blur="changeAddress"
       ></b-form-input>
     </b-input-group>
   </div>
@@ -65,9 +61,14 @@ export default {
   props: {
     address: Object,
   },
+  data() {
+    return {
+      newAddress: this.address,
+    };
+  },
   methods: {
-    changeAddress(obj) {
-      this.$emit("changeAddress", obj);
+    changeAddress() {
+      this.$emit("changeAddress", this.address);
     },
   },
 };

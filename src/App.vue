@@ -1,17 +1,16 @@
 <template>
   <div id="app">
-    <ContactForm />
+    <MainNavigation />
   </div>
 </template>
 
 <script>
-import ContactForm from './components/ContactForm.vue';
+import MainNavigation from "./components/MainNavigation.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    ContactForm
-  }
-}
+    MainNavigation,
+  },
+};
 </script>
-

@@ -1,5 +1,6 @@
 <template>
   <div class="contact-form">
+    <notifications group="foo" position="bottom right" />
     <form class="validation-form" @submit.prevent="sendForm">
       <h2 class="title-form">Contact Form</h2>
 
@@ -68,13 +69,12 @@
       <b-form-checkbox size="large" v-model="isAddressVisible"
         >Address options</b-form-checkbox
       >
-      <KeepAlive>
-        <AddressForm
-          v-if="isAddressVisible"
-          :address.sync="address"
-          @changeAddress="changeAddress"
-        />
-      </KeepAlive>
+
+      <AddressForm
+        v-if="isAddressVisible"
+        :address="address"
+        @changeAddress="changeAddress"
+      />
 
       <b-button
         v-b-modal="'sex-modal'"
@@ -96,7 +96,7 @@
       </b-modal>
 
       <b-button pill variant="success" class="button-form" type="submit"
-        >SEND</b-button
+        >Send</b-button
       >
     </form>
   </div>
@@ -130,6 +130,7 @@ const MESSAGE_REQUIRED_VALUES = "Match required fields!";
 Vue.use(VueAxios, axios);
 
 export default {
+  name: "ContactForm",
   components: {
     AddressForm,
   },
@@ -162,9 +163,11 @@ export default {
         subject: "",
         message: "",
       },
-      sendStatus: "",
       isAddressVisible: false,
     };
+  },
+  props: {
+    redirectPath: String,
   },
   methods: {
     validateName() {
@@ -218,6 +221,12 @@ export default {
         return true;
       } else return false;
     },
+    goToNextForm() {
+      const id = this.$route.params.id;
+      if (id < 3) {
+        this.$router.push({ name: "ContactForm", params: { id: id + 1 } });
+      }
+    },
     sendForm() {
       if (this.checkErrors()) {
         console.log(this.dataToSend);
@@ -226,27 +235,48 @@ export default {
             "https://940b0ec3-8a38-4aae-9e22-fff37a53afca.mock.pstmn.io/message",
             this.dataToSend
           )
-          .then((response) => (this.sendStatus = response.data.status))
-          .catch((err) => {
-            if (err) {
-              this.sendStatus = "error";
+          .then((response) => {
+            if (response) {
+              this.resetFields();
+              this.$notify({
+                group: "foo",
+                title: SUCCESS_MESSAGE,
+                type: "success",
+              });
+              this.goToNextForm();
             }
-            return console.log(err);
+          })
+          .catch((err) => {
+            console.log(err);
+            if (err) {
+              this.$notify({
+                group: "foo",
+                title: ERROR_MESSAGE,
+                type: "error",
+              });
+            }
           });
       } else {
-        alert(MESSAGE_REQUIRED_VALUES);
+        this.$notify({
+          group: "foo",
+          title: MESSAGE_REQUIRED_VALUES,
+          type: "error",
+        });
       }
     },
-    changeAddress({ value, name }) {
-      if (name === "city") {
-        this.address.city = value;
-      } else if (name === "street") {
-        this.address.street = value;
-      } else if (name === "houseNumber") {
-        this.address.houseNumber = value;
-      } else if (name === "apartmentNumber") {
-        this.address.apartmentNumber = value;
-      }
+    changeAddress(newAddress) {
+      this.address = newAddress;
+    },
+    resetFields() {
+      this.name = "";
+      this.email = "";
+      this.subject = "";
+      this.message = "";
+      this.sex = "";
+      this.address.city = "";
+      this.address.street = "";
+      this.address.houseNumber = "";
+      this.address.apartmentNumber = "";
     },
   },
   computed: {
@@ -259,25 +289,6 @@ export default {
         sex: this.sex,
         address: this.address,
       };
-    },
-  },
-  watch: {
-    sendStatus: function () {
-      if (this.sendStatus === "success") {
-        alert(SUCCESS_MESSAGE);
-        this.name = "";
-        this.email = "";
-        this.subject = "";
-        this.message = "";
-        this.sex = "";
-        this.address.city = "";
-        this.address.street = "";
-        this.address.houseNumber = "";
-        this.address.apartmentNumber = "";
-      } else if (this.sendStatus === "error") {
-        alert(ERROR_MESSAGE);
-      }
-      this.sendStatus = "";
     },
   },
 };
