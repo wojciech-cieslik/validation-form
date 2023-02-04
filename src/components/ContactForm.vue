@@ -223,18 +223,22 @@ export default {
     },
     goToNextForm() {
       const id = this.$route.params.id;
-      if (id < 3) {
-        this.$router.push({ name: "ContactForm", params: { id: id + 1 } });
+      if (id === "primary") {
+        this.$router.push({
+          name: "contact-form",
+          params: { id: "secondary" },
+        });
+      } else if (id === "secondary") {
+        this.$router.push({ name: "contact-form", params: { id: "contact" } });
       }
     },
     sendForm() {
       if (this.checkErrors()) {
+        const url =
+          "https://940b0ec3-8a38-4aae-9e22-fff37a53afca.mock.pstmn.io/message";
         console.log(this.dataToSend);
         this.axios
-          .post(
-            "https://940b0ec3-8a38-4aae-9e22-fff37a53afca.mock.pstmn.io/message",
-            this.dataToSend
-          )
+          .post(url, this.dataToSend)
           .then((response) => {
             if (response) {
               this.resetFields();
@@ -289,6 +293,13 @@ export default {
         sex: this.sex,
         address: this.address,
       };
+    },
+  },
+  directives: {
+    info: {
+      bind: function (el) {
+        alert(el.innerHTML);
+      },
     },
   },
 };

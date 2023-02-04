@@ -4,7 +4,7 @@
       <div v-for="link in links" :key="link.name">
         <RouterLink
           class="navigation-element"
-          :to="{ name: 'ContactForm', params: { id: link.id } }"
+          :to="{ name: 'contact-form', params: { id: link.id } }"
           >{{ link.name }}</RouterLink
         >
       </div>
@@ -21,9 +21,9 @@ export default {
   data() {
     return {
       links: [
-        { name: "Primary Form", id: 1 },
-        { name: "Secondary Form", id: 2 },
-        { name: "Contact Form", id: 3 },
+        { name: "Primary Form", id: "primary" },
+        { name: "Secondary Form", id: "secondary" },
+        { name: "Contact Form", id: "contact" },
       ],
     };
   },

@@ -71,5 +71,10 @@ export default {
       this.$emit("changeAddress", this.address);
     },
   },
+  filters: {
+    addContent: function (value, argument) {
+      return value + argument;
+    },
+  },
 };
 </script>
